@@ -1,0 +1,27 @@
+{
+  "name": "@leofcoin/launch-chain",
+  "version": "0.1.0",
+  "description": "",
+  "exports": {
+    ".": "./exports/launch.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leofcoin/launch-chain.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leofcoin/launch-chain/issues"
+  },
+  "homepage": "https://github.com/leofcoin/launch-chain#readme",
+  "dependencies": {
+    "@leofcoin/chain": "^1.4.5",
+    "@leofcoin/endpoints": "^0.1.0"
+  }
+}
