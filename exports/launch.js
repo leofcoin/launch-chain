@@ -78,7 +78,7 @@ const launch = async (options = {ws, http, network: 'leofcoin:peach'}) => {
   if (options.ws?.port && !options.ws.url) options.ws.url = `ws://localhost:${options.ws.port}`
 
   const clients = await hasClient(options.http.url, options.ws.url, options.networkVersion)
-  let endpoints
+  let endpoints = {}
   let chain
   let mode
 
@@ -93,11 +93,11 @@ const launch = async (options = {ws, http, network: 'leofcoin:peach'}) => {
 
     chain = await new Chain()
 
-    if (ws) {
+    if (endpoints.ws) {
       await wsServer(chain, options.ws.port, options.networkVersion)
       endpoints.ws = options.ws.url
     }
-    if (http) {
+    if (endpoints.http) {
       await httpServer(chain, options.http.port, options.networkVersion)
       endpoints.http = options.http.url
     }
