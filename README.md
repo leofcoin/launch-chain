@@ -36,3 +36,5 @@ const {chain, endpoints, mode} = await launch()
   http: false
 }
 ```
+
+## needs --openssl-legacy-provider
