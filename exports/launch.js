@@ -1,6 +1,6 @@
 import Node from '@leofcoin/chain/node'
 import Chain from '@leofcoin/chain/chain'
-import nodeConfig from '@leofcoin/lib/node-config.js'
+import nodeConfig from '@leofcoin/lib/node-config'
 import wsServer from '@leofcoin/endpoints/ws'
 import httpServer from '@leofcoin/endpoints/http'
 
