@@ -82,14 +82,14 @@ const launch = async (options = {ws, http, network: 'leofcoin:peach'}) => {
   let chain
   let mode
 
-  if (clients) {
+  if (clients.http || clients.ws) {
     Object.entries(clients).forEach(([key, value]) => {
       if (value) endpoints[key] = options[key].url      
     })
     mode = 'remote'
   } else {    
-    await new Node({ network })
-    await nodeConfig({ network })
+    await new Node({ network: options.network })
+    await nodeConfig({ network: options.network })
 
     chain = await new Chain()
 
