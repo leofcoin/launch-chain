@@ -67,7 +67,7 @@ const hasClient = async (httpURL, wsURL, networkVersion) => {
  * @param {object} options { ws: boolean || {url: string, port: number}, http: boolean || {url: string, port: number}, network}
  * @returns '{ mode: string, endpoints: object, chain}'
  */
-const launch = async (options = {ws, http, network: 'leofcoin:peach'}) => {
+const launch = async (options = {}) => {
   if (!options) options = {}
   if (!options.network) options.network = 'leofcoin:peach'
   if (options.ws === undefined) options.ws = { port: 4040 }
@@ -93,11 +93,11 @@ const launch = async (options = {ws, http, network: 'leofcoin:peach'}) => {
 
     chain = await new Chain()
 
-    if (endpoints.ws) {
+    if (options.ws) {
       await wsServer(chain, options.ws.port, options.networkVersion)
       endpoints.ws = options.ws.url
     }
-    if (endpoints.http) {
+    if (options.http) {
       await httpServer(chain, options.http.port, options.networkVersion)
       endpoints.http = options.http.url
     }
