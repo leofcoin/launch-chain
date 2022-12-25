@@ -70,6 +70,7 @@ const hasClient = async (httpURL, wsURL, networkVersion) => {
 const launch = async (options = {}) => {
   if (!options) options = {}
   if (!options.network) options.network = 'leofcoin:peach'
+  if (!options.stars) options.stars = ['wss://peach.leofcoin.org']
   if (options.ws === undefined) options.ws = { port: 4040 }
   if (options.http === undefined) options.http = { port: 8080 }
   if (options.networkVersion === undefined) options.networkVersion = options.network.replace(':', '-')
@@ -88,8 +89,8 @@ const launch = async (options = {}) => {
     })
     mode = 'remote'
   } else {    
-    await new Node({ network: options.network })
-    await nodeConfig({ network: options.network })
+    await new Node({ network: options.network, stars: options.stars })
+    await nodeConfig({ network: options.network, stars: options.stars })
 
     chain = await new Chain()
 

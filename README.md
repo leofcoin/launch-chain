@@ -18,6 +18,7 @@ const {chain, endpoints, mode} = await launch()
 ```js
 {
   network: 'leofcoin:peach',
+  stars: ['wss://peach.leofcoin.org'],
   ws: {
     port: 4040,
     url: 'ws://localhost:4040'
@@ -31,6 +32,7 @@ const {chain, endpoints, mode} = await launch()
 
 ### disabling options 
 ```js
+stars: [] // note that disabling stars results in no peer discovery
 {
   ws: false,
   http: false
