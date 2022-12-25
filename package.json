@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/leofcoin/launch-chain#readme",
   "dependencies": {
-    "@leofcoin/chain": "^1.4.5",
-    "@leofcoin/endpoints": "^0.1.0"
+    "@leofcoin/chain": "^1.4.8",
+    "@leofcoin/endpoints": "^0.2.0"
   }
 }
