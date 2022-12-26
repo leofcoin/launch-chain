@@ -1,8 +1,6 @@
 import Node from '@leofcoin/chain/node'
 import Chain from '@leofcoin/chain/chain'
 import nodeConfig from '@leofcoin/lib/node-config'
-import wsServer from '@leofcoin/endpoints/ws'
-import httpServer from '@leofcoin/endpoints/http'
 
 /**
  * 
@@ -95,10 +93,14 @@ const launch = async (options = {}) => {
     chain = await new Chain()
 
     if (options.ws) {
+      const importee = await import('@leofcoin/endpoints/ws')
+      const wsServer = importee.default
       await wsServer(chain, options.ws.port, options.networkVersion)
       endpoints.ws = options.ws.url
     }
     if (options.http) {
+      const importee = await import('@leofcoin/endpoints/http')
+      const httpServer = importee.default
       await httpServer(chain, options.http.port, options.networkVersion)
       endpoints.http = options.http.url
     }
