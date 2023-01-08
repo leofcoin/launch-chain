@@ -3,10 +3,12 @@
   "version": "0.2.3",
   "description": "",
   "exports": {
-    ".": "./exports/launch.js"
+    ".": "./index.js"
   },
+  "types": "./index.d.ts",
   "type": "module",
   "scripts": {
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +25,10 @@
   "dependencies": {
     "@leofcoin/chain": "^1.4.8",
     "@leofcoin/endpoints": "^0.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup": "^3.9.1",
+    "tslib": "^2.4.1"
   }
 }

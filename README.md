@@ -19,6 +19,7 @@ const {chain, endpoints, mode} = await launch()
 {
   network: 'leofcoin:peach',
   stars: ['wss://peach.leofcoin.org'],
+  forceRemote: false, // when set to true only tries to connect to an external/local exposed node
   ws: {
     port: 4040,
     url: 'ws://localhost:4040'
