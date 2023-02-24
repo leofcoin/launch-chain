@@ -105,7 +105,7 @@ const hasClient = async (httpURL: string, wsURL: string, networkVersion: string)
  * @param {object} options { ws: boolean || {url: string, port: number}, http: boolean || {url: string, port: number}, network}
  * @returns '{ mode: string, endpoints: object, chain}'
  */
-const launch = async (options: launchOptions): Promise<launchReturn> => {
+const launch = async (options: launchOptions, password: string): Promise<launchReturn> => {
   if (!options) options = defaultOptions
   else options = {...defaultOptions, ...options }
 
@@ -149,7 +149,7 @@ const launch = async (options: launchOptions): Promise<launchReturn> => {
   } else {   
     if (options.forceRemote) throw new Error(`forceRemote was set but no remotes connected`)
     
-    await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
+    await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
     await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
     chain = await new Chain()

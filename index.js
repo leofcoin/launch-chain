@@ -65,7 +65,7 @@ const hasWs = async (url, networkVersion) => {
  * @param {object} options { ws: boolean || {url: string, port: number}, http: boolean || {url: string, port: number}, network}
  * @returns '{ mode: string, endpoints: object, chain}'
  */
-const launch = async (options) => {
+const launch = async (options, password) => {
     if (!options)
         options = defaultOptions;
     else
@@ -108,7 +108,7 @@ const launch = async (options) => {
     else {
         if (options.forceRemote)
             throw new Error(`forceRemote was set but no remotes connected`);
-        await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion });
+        await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password);
         await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion });
         chain = await new Chain();
         if (options.ws) {
