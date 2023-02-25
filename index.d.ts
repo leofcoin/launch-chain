@@ -1,13 +1,20 @@
 import Chain from '@leofcoin/chain/chain';
+import WSClient from '@leofcoin/endpoint-clients/ws';
+import HttpClient from '@leofcoin/endpoint-clients/http';
 type launchMode = 'direct' | 'remote';
 type endpointReturns = {
     http?: string[];
     ws?: string[];
 };
+type clientReturns = {
+    http?: HttpClient[];
+    ws?: WSClient[];
+};
 type launchReturn = {
     chain: Chain;
     mode: launchMode;
     endpoints: endpointReturns;
+    clients: clientReturns;
 };
 type endpointOptions = {
     port: number;
@@ -18,6 +25,7 @@ type launchOptions = {
     networkVersion?: string;
     stars: string[];
     forceRemote: boolean;
+    mode?: launchMode;
     ws?: endpointOptions[] | undefined;
     http?: endpointOptions[] | undefined;
 };

@@ -1,12 +1,15 @@
 import Node from '@leofcoin/chain/node';
 import Chain from '@leofcoin/chain/chain';
 import nodeConfig from '@leofcoin/lib/node-config';
+import WSClient from '@leofcoin/endpoint-clients/ws';
+import HttpClient from '@leofcoin/endpoint-clients/http';
 
 const defaultOptions = {
     network: 'leofcoin:peach',
     networkVersion: 'peach',
     stars: ['wss://peach.leofcoin.org'],
     forceRemote: false,
+    mode: 'direct',
     ws: [{
             port: 4040
         }],
@@ -20,22 +23,21 @@ const defaultOptions = {
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
-const hasHttp = async (url, networkVersion) => {
+const getHttp = async (url, networkVersion) => {
     try {
-        await fetch(url + '/network');
-        return true;
+        const client = new HttpClient(url, networkVersion);
+        await client.network();
+        return client;
     }
     catch (error) {
-        return false;
+        return undefined;
     }
 };
 const tryWs = (url, networkVersion) => new Promise(async (resolve, reject) => {
     try {
-        const socket = await new WebSocket(url, networkVersion);
-        socket.onerror = () => resolve(false);
-        if (socket.readyState === 1)
-            socket.close();
-        resolve(true);
+        const socket = await new WSClient(url, networkVersion);
+        await socket.init();
+        resolve(socket);
     }
     catch (error) {
         reject(error);
@@ -47,13 +49,13 @@ const tryWs = (url, networkVersion) => new Promise(async (resolve, reject) => {
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
-const hasWs = async (url, networkVersion) => {
+const getWS = async (url, networkVersion) => {
     try {
-        await tryWs(url, networkVersion);
-        return true;
+        const ws = await tryWs(url, networkVersion);
+        return ws;
     }
     catch (error) {
-        return false;
+        return undefined;
     }
 };
 // chain is undefined when mode is remote
@@ -74,20 +76,26 @@ const launch = async (options, password) => {
         http: [],
         ws: []
     };
+    const availableClients = {
+        http: [],
+        ws: []
+    };
     if (options.http) {
         for (const endpoint of options.http) {
             if (endpoint.port && !endpoint.url)
                 endpoint.url = `http://localhost:${endpoint.port}`;
-            if (await hasHttp(endpoint.url, options.networkVersion))
-                availableEndpoints.http.push(endpoint.url);
+            const client = await getHttp(endpoint.url, options.networkVersion);
+            if (client)
+                availableEndpoints.http.push(endpoint.url) && availableClients.http.push({ url: endpoint.url, client });
         }
     }
     if (options.ws) {
         for (const endpoint of options.ws) {
             if (endpoint.port && !endpoint.url)
                 endpoint.url = `ws://localhost:${endpoint.port}`;
-            if (await hasWs(endpoint.url, options.networkVersion))
-                availableEndpoints.ws.push(endpoint.url);
+            const client = await getWS(endpoint.url, options.networkVersion);
+            if (client)
+                availableEndpoints.ws.push(endpoint.url) && availableClients.ws.push({ url: endpoint.url, client });
         }
     }
     const endpoints = {
@@ -128,7 +136,8 @@ const launch = async (options, password) => {
     return {
         chain,
         mode,
-        endpoints
+        endpoints,
+        clients: availableClients
     };
 };
 

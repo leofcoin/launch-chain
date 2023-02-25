@@ -1,6 +1,8 @@
 import Node from '@leofcoin/chain/node'
 import Chain from '@leofcoin/chain/chain'
 import nodeConfig from '@leofcoin/lib/node-config'
+import WSClient from '@leofcoin/endpoint-clients/ws'
+import HttpClient from '@leofcoin/endpoint-clients/http'
 
 type launchMode = 'direct' | 'remote'
 
@@ -9,10 +11,16 @@ type endpointReturns = {
   ws?: string[],
 }
 
+type clientReturns = {
+  http?: HttpClient[],
+  ws?: WSClient[],
+}
+
 type launchReturn = {
   chain: Chain,
   mode: launchMode,
-  endpoints: endpointReturns
+  endpoints: endpointReturns,
+  clients: clientReturns
 }
 
 type endpointOptions = {
@@ -25,6 +33,7 @@ type launchOptions = {
   networkVersion?: string,
   stars: string[],
   forceRemote: boolean,
+  mode?: launchMode,
   ws?: endpointOptions[] | undefined,
   http?: endpointOptions[] | undefined,
 }
@@ -34,6 +43,7 @@ const defaultOptions:launchOptions = {
   networkVersion: 'peach',
   stars: ['wss://peach.leofcoin.org'],
   forceRemote: false,
+  mode: 'direct',
   ws: [{
     port: 4040
   }],
@@ -48,21 +58,21 @@ const defaultOptions:launchOptions = {
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
-const hasHttp = async (url: string, networkVersion: string) => {
+const getHttp = async (url: string, networkVersion: string): Promise<undefined | HttpClient> => {
   try {
-    await fetch(url + '/network')
-    return true
+    const client = new HttpClient(url, networkVersion)
+    await client.network()
+    return client
   } catch (error) {
-    return false
+    return undefined
   }
 }
 
-const tryWs = (url: string | URL, networkVersion: string | string[]): Promise<boolean> => new Promise(async (resolve, reject) => {
+const tryWs = (url: string, networkVersion: string): Promise<WSClient> => new Promise(async (resolve, reject) => {
   try {
-    const socket = await new WebSocket(url, networkVersion)
-    socket.onerror = () => resolve(false)
-    if (socket.readyState === 1) socket.close()
-    resolve(true)
+    const socket = await new WSClient(url, networkVersion)
+    await socket.init()
+    resolve(socket)
   } catch (error) {
     reject(error)
   }
@@ -74,12 +84,12 @@ const tryWs = (url: string | URL, networkVersion: string | string[]): Promise<bo
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
-const hasWs = async (url: string, networkVersion: string): Promise<boolean> => {
+const getWS = async (url: string, networkVersion: string): Promise<WSClient> => {
   try {
-    await tryWs(url, networkVersion)
-    return true
+    const ws = await tryWs(url, networkVersion)
+    return ws
   } catch (error) {
-    return false
+    return undefined
   }
 }
 
@@ -91,8 +101,8 @@ const hasWs = async (url: string, networkVersion: string): Promise<boolean> => {
  * @returns Promise({http: boolean, ws: boolean})
  */
 const hasClient = async (httpURL: string, wsURL: string, networkVersion: string) => {
-  const ws = await hasWs(wsURL, networkVersion)
-  const http = await hasHttp(httpURL, networkVersion)
+  const ws = await getWS(wsURL, networkVersion)
+  const http = await getHttp(httpURL, networkVersion)
   return {http, ws}
 }
 
@@ -114,17 +124,24 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     ws: []
   }
 
+  const availableClients: clientReturns = {
+    http: [],
+    ws: []
+  }
+
   if (options.http) {
     for (const endpoint of options.http) {
       if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
-      if (await hasHttp(endpoint.url, options.networkVersion)) availableEndpoints.http.push(endpoint.url)
+      const client = await getHttp(endpoint.url, options.networkVersion)
+      if (client) availableEndpoints.http.push(endpoint.url) && availableClients.http.push({url: endpoint.url, client})
     }
   }
 
   if (options.ws) {
     for (const endpoint of options.ws) {
       if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`      
-      if (await hasWs(endpoint.url, options.networkVersion)) availableEndpoints.ws.push(endpoint.url)
+      const client = await getWS(endpoint.url, options.networkVersion)
+      if (client) availableEndpoints.ws.push(endpoint.url) && availableClients.ws.push({url: endpoint.url, client})
     }
   }
 
@@ -171,7 +188,8 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
   return {
     chain,
     mode,
-    endpoints
+    endpoints,
+    clients: availableClients
   }
 }
 
