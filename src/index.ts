@@ -4,7 +4,7 @@ import nodeConfig from '@leofcoin/lib/node-config'
 import WSClient from '@leofcoin/endpoint-clients/ws'
 import HttpClient from '@leofcoin/endpoint-clients/http'
 
-type launchMode = 'direct' | 'remote'
+type launchMode = 'direct' | 'remote' | 'server'
 
 type endpointReturns = {
   http?: string[],
@@ -38,7 +38,7 @@ type launchOptions = {
   http?: endpointOptions[] | undefined,
 }
 
-const defaultOptions:launchOptions = {
+const defaultOptions: launchOptions = {
   network: 'leofcoin:peach',
   networkVersion: 'peach',
   stars: ['wss://peach.leofcoin.org'],
@@ -119,30 +119,9 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
   if (!options) options = defaultOptions
   else options = {...defaultOptions, ...options }
 
-  const availableEndpoints: endpointReturns = {
+  const clients: clientReturns = {
     http: [],
     ws: []
-  }
-
-  const availableClients: clientReturns = {
-    http: [],
-    ws: []
-  }
-
-  if (options.http) {
-    for (const endpoint of options.http) {
-      if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
-      const client = await getHttp(endpoint.url, options.networkVersion)
-      if (client) availableEndpoints.http.push(endpoint.url) && availableClients.http.push({url: endpoint.url, client})
-    }
-  }
-
-  if (options.ws) {
-    for (const endpoint of options.ws) {
-      if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`      
-      const client = await getWS(endpoint.url, options.networkVersion)
-      if (client) availableEndpoints.ws.push(endpoint.url) && availableClients.ws.push({url: endpoint.url, client})
-    }
   }
 
   const endpoints: endpointReturns = {
@@ -151,21 +130,25 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
   }
 
   let chain: Chain
-  let mode: launchMode
-
-  if (availableEndpoints.http.length > 0 || availableEndpoints.ws.length > 0) {
-    availableEndpoints.http.forEach(endpoint => {
-      endpoints.http.push(endpoint)
-    })
-
-    availableEndpoints.ws.forEach(endpoint => {
-      endpoints.ws.push(endpoint)
-    })
-    
-    mode = 'remote'
-  } else {   
-    if (options.forceRemote) throw new Error(`forceRemote was set but no remotes connected`)
-    
+  
+  if (options.mode === 'remote') {
+    if (options.http) {
+      for (const endpoint of options.http) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
+        const client = await getHttp(endpoint.url, options.networkVersion)
+        if (client) endpoints.http.push(endpoint.url) && clients.http.push({url: endpoint.url, client})
+      }
+    }
+  
+    if (options.ws) {
+      for (const endpoint of options.ws) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`      
+        const client = await getWS(endpoint.url, options.networkVersion)
+        if (client) endpoints.ws.push(endpoint.url) && clients.ws.push({url: endpoint.url, client})
+      }
+    }
+    if (endpoints.http.length === 0 && endpoints.ws.length === 0) throw new Error(`no remotes connected`)
+  } else if (options.mode === 'direct') {
     await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
     await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
@@ -174,22 +157,66 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     if (options.ws) {
       const importee = await import('@leofcoin/endpoints/ws')
       const wsServer = importee.default
-      await wsServer(chain, options.ws[0].port, options.networkVersion)
-      endpoints.ws.push(options.ws[0].url)
+
+      for (const endpoint of options.ws) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`
+        
+        await wsServer(chain, endpoint.port, options.networkVersion)
+        endpoints.ws.push(endpoint.url)
+        
+        const client = await getWS(endpoint.url, options.networkVersion)
+        if (client) endpoints.ws.push(endpoint.url) && clients.ws.push({url: endpoint.url, client})
+      } 
     }
+
     if (options.http) {
       const importee = await import('@leofcoin/endpoints/http')
       const httpServer = importee.default
-      await httpServer(chain, options.http[0].port, options.networkVersion)
-      endpoints.http.push(options.http[0].url)
+
+      for (const endpoint of options.http) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
+
+        await httpServer(chain, endpoint.port, options.networkVersion)
+        endpoints.http.push(endpoint.url)
+
+        const client = await getHttp(endpoint.url, options.networkVersion)
+        if (client) endpoints.http.push(endpoint.url) && clients.http.push({url: endpoint.url, client})
+      }
     }
-    mode = 'direct'
+  } else {
+    await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
+    await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
+
+    chain = await new Chain()
+
+    if (options.ws) {
+      const importee = await import('@leofcoin/endpoints/ws')
+      const wsServer = importee.default
+
+      for (const endpoint of options.ws) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`
+        await wsServer(chain, endpoint.port, options.networkVersion)
+        endpoints.ws.push(endpoint.url)
+      } 
+    }
+
+    if (options.http) {
+      const importee = await import('@leofcoin/endpoints/http')
+      const httpServer = importee.default
+
+      for (const endpoint of options.http) {
+        if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
+        await httpServer(chain, endpoint.port, options.networkVersion)
+        endpoints.http.push(endpoint.url)
+      }
+    }
   }
+  
   return {
     chain,
-    mode,
+    mode: options.mode,
     endpoints,
-    clients: availableClients
+    clients
   }
 }
 

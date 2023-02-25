@@ -1,7 +1,7 @@
 import Chain from '@leofcoin/chain/chain';
 import WSClient from '@leofcoin/endpoint-clients/ws';
 import HttpClient from '@leofcoin/endpoint-clients/http';
-type launchMode = 'direct' | 'remote';
+type launchMode = 'direct' | 'remote' | 'server';
 type endpointReturns = {
     http?: string[];
     ws?: string[];
