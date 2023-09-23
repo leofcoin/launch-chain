@@ -25,7 +25,8 @@
   "dependencies": {
     "@leofcoin/chain": "^1.4.8",
     "@leofcoin/endpoint-clients": "^0.2.3",
-    "@leofcoin/endpoints": "^0.2.10"
+    "@leofcoin/endpoints": "^0.2.10",
+    "@leofcoin/networks": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",

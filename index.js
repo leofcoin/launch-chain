@@ -3,11 +3,12 @@ import Chain from '@leofcoin/chain/chain';
 import nodeConfig from '@leofcoin/lib/node-config';
 import WSClient from '@leofcoin/endpoint-clients/ws';
 import HttpClient from '@leofcoin/endpoint-clients/http';
+import networks from '@leofcoin/networks';
 
 const defaultOptions = {
     network: 'leofcoin:peach',
     networkVersion: 'peach',
-    stars: ['wss://peach.leofcoin.org'],
+    stars: networks.leofcoin.peach.stars,
     forceRemote: false,
     mode: 'direct',
     ws: [{
