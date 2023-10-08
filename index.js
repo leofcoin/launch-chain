@@ -89,7 +89,7 @@ const launch = async (options, password) => {
                     endpoint.url = `http://localhost:${endpoint.port}`;
                 const client = await getHttp(endpoint.url, options.networkVersion);
                 if (client)
-                    endpoints.http.push(endpoint.url) && clients.http.push({ url: endpoint.url, client });
+                    endpoints.http.push(endpoint.url) && clients.http.push(client);
             }
         }
         if (options.ws) {
@@ -97,8 +97,7 @@ const launch = async (options, password) => {
                 if (endpoint.port && !endpoint.url)
                     endpoint.url = `ws://localhost:${endpoint.port}`;
                 const client = await getWS(endpoint.url, options.networkVersion);
-                if (client)
-                    endpoints.ws.push(endpoint.url) && clients.ws.push({ url: endpoint.url, client });
+                client && endpoints.ws.push(endpoint.url) && clients.ws.push(client);
             }
         }
         if (endpoints.http.length === 0 && endpoints.ws.length === 0)
@@ -117,8 +116,7 @@ const launch = async (options, password) => {
                 await wsServer(chain, endpoint.port, options.networkVersion);
                 endpoints.ws.push(endpoint.url);
                 const client = await getWS(endpoint.url, options.networkVersion);
-                if (client)
-                    endpoints.ws.push(endpoint.url) && clients.ws.push({ url: endpoint.url, client });
+                client && clients.ws.push(client);
             }
         }
         if (options.http) {
@@ -130,8 +128,7 @@ const launch = async (options, password) => {
                 await httpServer(chain, endpoint.port, options.networkVersion);
                 endpoints.http.push(endpoint.url);
                 const client = await getHttp(endpoint.url, options.networkVersion);
-                if (client)
-                    endpoints.http.push(endpoint.url) && clients.http.push({ url: endpoint.url, client });
+                client && clients.http.push(client);
             }
         }
     }

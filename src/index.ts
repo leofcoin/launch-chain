@@ -137,7 +137,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
       for (const endpoint of options.http) {
         if (endpoint.port && !endpoint.url) endpoint.url = `http://localhost:${endpoint.port}`
         const client = await getHttp(endpoint.url, options.networkVersion)
-        if (client) endpoints.http.push(endpoint.url) && clients.http.push({url: endpoint.url, client})
+        if (client) endpoints.http.push(endpoint.url) && clients.http.push(client)
       }
     }
   
@@ -145,7 +145,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
       for (const endpoint of options.ws) {
         if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`      
         const client = await getWS(endpoint.url, options.networkVersion)
-        if (client) endpoints.ws.push(endpoint.url) && clients.ws.push({url: endpoint.url, client})
+        client && endpoints.ws.push(endpoint.url) && clients.ws.push(client)
       }
     }
     if (endpoints.http.length === 0 && endpoints.ws.length === 0) throw new Error(`no remotes connected`)
@@ -166,7 +166,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
         endpoints.ws.push(endpoint.url)
         
         const client = await getWS(endpoint.url, options.networkVersion)
-        if (client) endpoints.ws.push(endpoint.url) && clients.ws.push({url: endpoint.url, client})
+        client && clients.ws.push(client)
       } 
     }
 
@@ -181,7 +181,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
         endpoints.http.push(endpoint.url)
 
         const client = await getHttp(endpoint.url, options.networkVersion)
-        if (client) endpoints.http.push(endpoint.url) && clients.http.push({url: endpoint.url, client})
+        client && clients.http.push(client)
       }
     }
   } else {

@@ -5,4 +5,4 @@ const {chain, endpoints, clients, mode } = await launch({
   networkVersion: 'peach',
   mode: 'direct'
 })
-console.log(await clients.ws[0].client.networkStats());
+console.log(await clients.ws[0].networkStats());
