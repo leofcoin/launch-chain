@@ -3,9 +3,14 @@
   "version": "0.3.4",
   "description": "",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "import": "./exports/index.js",
+      "types": "./exports/index.d.ts"
+    }
   },
-  "types": "./index.d.ts",
+  "files": [
+    "exports"
+  ],
   "type": "module",
   "scripts": {
     "build": "rollup -c",

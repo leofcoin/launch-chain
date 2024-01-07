@@ -8,35 +8,35 @@ import networks from '@leofcoin/networks'
 type launchMode = 'direct' | 'remote' | 'server'
 
 type endpointReturns = {
-  http?: string[],
-  ws?: string[],
+  http?: string[]
+  ws?: string[]
 }
 
 type clientReturns = {
-  http?: HttpClient[],
-  ws?: WSClient[],
+  http?: HttpClient[]
+  ws?: WSClient[]
 }
 
 type launchReturn = {
-  chain: Chain,
-  mode: launchMode,
-  endpoints: endpointReturns,
+  chain: Chain
+  mode: launchMode
+  endpoints: endpointReturns
   clients: clientReturns
 }
 
 type endpointOptions = {
-  port: number,
+  port: number
   url?: string
 }
 
 type launchOptions = {
-  network?: string,
-  networkVersion?: string,
-  stars: string[],
-  forceRemote: boolean,
-  mode?: launchMode,
-  ws?: endpointOptions[] | undefined,
-  http?: endpointOptions[] | undefined,
+  network?: string
+  networkVersion?: string
+  stars: string[]
+  forceRemote: boolean
+  mode?: launchMode
+  ws?: endpointOptions[] | undefined
+  http?: endpointOptions[] | undefined
 }
 
 const defaultOptions: launchOptions = {
@@ -45,17 +45,21 @@ const defaultOptions: launchOptions = {
   stars: networks.leofcoin.peach.stars,
   forceRemote: false,
   mode: 'direct',
-  ws: [{
-    port: 4040
-  }],
-  http: [{
-    port: 8080
-  }]
+  ws: [
+    {
+      port: 4040
+    }
+  ],
+  http: [
+    {
+      port: 8080
+    }
+  ]
 }
 
 /**
- * 
- * @param {string} url 
+ *
+ * @param {string} url
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
@@ -69,19 +73,20 @@ const getHttp = async (url: string, networkVersion: string): Promise<undefined |
   }
 }
 
-const tryWs = (url: string, networkVersion: string): Promise<WSClient> => new Promise(async (resolve, reject) => {
-  try {
-    const socket = await new WSClient(url, networkVersion)
-    await socket.init()
-    resolve(socket)
-  } catch (error) {
-    reject(error)
-  }
-})
+const tryWs = (url: string, networkVersion: string): Promise<WSClient> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const socket = await new WSClient(url, networkVersion)
+      await socket.init()
+      resolve(socket)
+    } catch (error) {
+      reject(error)
+    }
+  })
 
 /**
- * 
- * @param {string} url 
+ *
+ * @param {string} url
  * @param {string} networkVersion network/testnet-network sepperate by -
  * @returns Promise(boolean)
  */
@@ -95,16 +100,16 @@ const getWS = async (url: string, networkVersion: string): Promise<WSClient> => 
 }
 
 /**
- * 
- * @param {string} httpURL 
- * @param {string} wsURL 
- * @param {string} networkVersion 
+ *
+ * @param {string} httpURL
+ * @param {string} wsURL
+ * @param {string} networkVersion
  * @returns Promise({http: boolean, ws: boolean})
  */
 const hasClient = async (httpURL: string, wsURL: string, networkVersion: string) => {
   const ws = await getWS(wsURL, networkVersion)
   const http = await getHttp(httpURL, networkVersion)
-  return {http, ws}
+  return { http, ws }
 }
 
 // chain is undefined when mode is remote
@@ -112,13 +117,13 @@ const hasClient = async (httpURL: string, wsURL: string, networkVersion: string)
 // when mode is remote means an instance is already running
 // when mode is direct means chain is directly available and no endpoint is needed to interact with it
 /**
- * 
+ *
  * @param {object} options { ws: boolean || {url: string, port: number}, http: boolean || {url: string, port: number}, network}
  * @returns '{ mode: string, endpoints: object, chain}'
  */
 const launch = async (options: launchOptions, password: string): Promise<launchReturn> => {
   if (!options) options = defaultOptions
-  else options = {...defaultOptions, ...options }
+  else options = { ...defaultOptions, ...options }
 
   const clients: clientReturns = {
     http: [],
@@ -131,7 +136,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
   }
 
   let chain: Chain
-  
+
   if (options.mode === 'remote') {
     if (options.http) {
       for (const endpoint of options.http) {
@@ -140,10 +145,10 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
         if (client) endpoints.http.push(endpoint.url) && clients.http.push(client)
       }
     }
-  
+
     if (options.ws) {
       for (const endpoint of options.ws) {
-        if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`      
+        if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`
         const client = await getWS(endpoint.url, options.networkVersion)
         client && endpoints.ws.push(endpoint.url) && clients.ws.push(client)
       }
@@ -161,13 +166,13 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
 
       for (const endpoint of options.ws) {
         if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`
-        
+
         await wsServer(chain, endpoint.port, options.networkVersion)
         endpoints.ws.push(endpoint.url)
-        
+
         const client = await getWS(endpoint.url, options.networkVersion)
         client && clients.ws.push(client)
-      } 
+      }
     }
 
     if (options.http) {
@@ -198,7 +203,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
         if (endpoint.port && !endpoint.url) endpoint.url = `ws://localhost:${endpoint.port}`
         await wsServer(chain, endpoint.port, options.networkVersion)
         endpoints.ws.push(endpoint.url)
-      } 
+      }
     }
 
     if (options.http) {
@@ -212,7 +217,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
       }
     }
   }
-  
+
   return {
     chain,
     mode: options.mode,
@@ -221,4 +226,4 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
   }
 }
 
-export { launch as default}
+export { launch as default }

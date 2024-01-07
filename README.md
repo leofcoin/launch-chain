@@ -1,11 +1,13 @@
 # lauch-chain
+
 > launch chain & peernet (reuses exposed transports when already running)
 
 ## usage
+
 ```js
 import launch from '@leofcoin/launch-chain'
 
-const {chain, endpoints, mode} = await launch()
+const { chain, endpoints, mode } = await launch()
 // chain is undefined when mode is remote
 // endpoints contain urls to connect to the desired remote
 // when mode is remote means an instance is already running
@@ -13,6 +15,7 @@ const {chain, endpoints, mode} = await launch()
 ```
 
 ## options
+
 ### default
 
 ```js
@@ -31,7 +34,8 @@ const {chain, endpoints, mode} = await launch()
 }
 ```
 
-### disabling options 
+### disabling options
+
 ```js
 stars: [] // note that disabling stars results in no peer discovery
 {
@@ -41,20 +45,19 @@ stars: [] // note that disabling stars results in no peer discovery
 ```
 
 ## build for browser
+
 no prebuild are provided since the esm switch, everything is written with the browser in mind so some simple ignores are enough to build.
 
 ### rollup
+
 ```js
-external: [
-  '@koush/wrtc',
-  '@leofcoin/endpoints/ws',
-  '@leofcoin/endpoints/http'
-]
+external: ['@koush/wrtc', '@leofcoin/endpoints/ws', '@leofcoin/endpoints/http']
 ```
 
 ### webpack
+
 ```js
-externals: {    
+externals: {
   '@koush/wrtc': false,
   '@leofcoin/endpoints/ws': false,
   '@leofcoin/endpoints/http': false

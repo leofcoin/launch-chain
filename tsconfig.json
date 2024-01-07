@@ -4,7 +4,6 @@
     "module": "NodeNext",
     "outDir": "./exports",
     "moduleResolution": "NodeNext",
-    "allowJs": true,
     "declaration": true
   },
   "include": ["./src/**/*"],
