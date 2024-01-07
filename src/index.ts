@@ -158,7 +158,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
     await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
-    chain = await new Chain()
+    chain = await new Chain({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
     if (options.ws) {
       const importee = await import('@leofcoin/endpoints/ws')
@@ -193,7 +193,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
     await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
-    chain = await new Chain()
+    chain = await new Chain({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
     if (options.ws) {
       const importee = await import('@leofcoin/endpoints/ws')
