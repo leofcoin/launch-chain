@@ -1,4 +1,4 @@
-import launch from './index.js'
+import launch from './exports/index.js'
 
 const { chain, endpoints, clients, mode } = await launch({
   network: 'leofcoin:peach',
