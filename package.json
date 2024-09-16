@@ -28,10 +28,10 @@
   },
   "homepage": "https://github.com/leofcoin/launch-chain#readme",
   "dependencies": {
-    "@leofcoin/chain": "^1.7.38",
+    "@leofcoin/chain": "^1.7.43",
     "@leofcoin/endpoint-clients": "^0.3.14",
     "@leofcoin/endpoints": "^0.4.4",
-    "@leofcoin/networks": "^1.1.6"
+    "@leofcoin/networks": "^1.1.11"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
