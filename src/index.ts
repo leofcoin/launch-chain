@@ -156,7 +156,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     if (endpoints.http.length === 0 && endpoints.ws.length === 0) throw new Error(`no remotes connected`)
   } else if (options.mode === 'direct') {
     await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
-    await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
+    await nodeConfig({ network: options.network, networkVersion: options.networkVersion })
 
     chain = await new Chain({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
@@ -191,7 +191,7 @@ const launch = async (options: launchOptions, password: string): Promise<launchR
     }
   } else {
     await new Node({ network: options.network, stars: options.stars, networkVersion: options.networkVersion }, password)
-    await nodeConfig({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
+    await nodeConfig({ network: options.network, networkVersion: options.networkVersion })
 
     chain = await new Chain({ network: options.network, stars: options.stars, networkVersion: options.networkVersion })
 
